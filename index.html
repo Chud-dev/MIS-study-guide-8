@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>MIS 301 — Open Source Software Study Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --orange:   #BF5700;
+    --orange-dk:#8B3E00;
+    --cream:    #FDF8F2;
+    --dark:     #1A1208;
+    --gold:     #FFB347;
+    --gold-lt:  #FFD280;
+    --tan:      #F0E6D3;
+    --border:   #D9C9B0;
+    --green:    #2D7A4F;
+    --red:      #B83232;
+    --green-bg: #E8F5EE;
+    --red-bg:   #FBE9E9;
+    --text:     #2C1A0A;
+    --muted:    #7A6550;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: var(--orange);
+    padding: 0;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 18px,
+      rgba(0,0,0,.06) 18px,
+      rgba(0,0,0,.06) 19px
+    );
+  }
+  .header-inner {
+    position: relative;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 36px 24px 32px;
+  }
+  .badge {
+    display: inline-block;
+    background: rgba(255,255,255,.15);
+    border: 1px solid rgba(255,255,255,.3);
+    color: #fff;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    font-size: .72rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    border-radius: 4px;
+    margin-bottom: 14px;
+  }
+  header h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2.4rem, 6vw, 4rem);
+    color: #fff;
+    letter-spacing: .04em;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  header p.sub {
+    color: rgba(255,255,255,.78);
+    font-size: .95rem;
+    font-weight: 400;
+    letter-spacing: .01em;
+  }
+  .longhorn-accent {
+    position: absolute;
+    right: 24px; top: 50%; transform: translateY(-50%);
+    font-size: 5rem;
+    opacity: .12;
+    user-select: none;
+    pointer-events: none;
+  }
+
+  /* ── TABS ── */
+  .tab-bar {
+    background: var(--dark);
+    display: flex;
+    max-width: 960px;
+    margin: 0 auto;
+    border-bottom: 3px solid var(--orange);
+  }
+  .tab-btn {
+    flex: 1;
+    padding: 14px 20px;
+    background: transparent;
+    border: none;
+    color: rgba(255,255,255,.55);
+    font-family: 'DM Sans', sans-serif;
+    font-size: .9rem;
+    font-weight: 600;
+    letter-spacing: .03em;
+    cursor: pointer;
+    transition: all .2s;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -3px;
+  }
+  .tab-btn:hover { color: var(--gold-lt); }
+  .tab-btn.active {
+    color: var(--gold);
+    border-bottom-color: var(--gold);
+  }
+
+  /* ── MAIN CONTAINER ── */
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 32px 20px 60px;
+  }
+
+  /* ── SEARCH ── */
+  .search-wrap {
+    margin-bottom: 28px;
+    position: relative;
+  }
+  .search-wrap input {
+    width: 100%;
+    padding: 13px 18px 13px 44px;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    background: #fff;
+    font-family: 'DM Sans', sans-serif;
+    font-size: .95rem;
+    color: var(--text);
+    transition: border-color .2s;
+    outline: none;
+  }
+  .search-wrap input:focus { border-color: var(--orange); }
+  .search-icon {
+    position: absolute;
+    left: 14px; top: 50%; transform: translateY(-50%);
+    color: var(--muted);
+    font-size: 1rem;
+    pointer-events: none;
+  }
+  #vocab-count {
+    font-size: .82rem;
+    color: var(--muted);
+    margin-top: 8px;
+    font-weight: 500;
+  }
+
+  /* ── VOCAB CARDS ── */
+  #vocab-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+    gap: 20px;
+  }
+  @media (max-width: 600px) {
+    #vocab-grid { grid-template-columns: 1fr; }
+  }
+  .vocab-card {
+    background: #fff;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(26,18,8,.06);
+    transition: transform .18s, box-shadow .18s;
+  }
+  .vocab-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(191,87,0,.13);
+  }
+  .card-head {
+    background: var(--dark);
+    padding: 14px 18px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .card-term {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.25rem;
+    color: var(--gold);
+    letter-spacing: .04em;
+    line-height: 1.1;
+  }
+  .cat-tag {
+    font-size: .68rem;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 20px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .cat-core     { background: rgba(191,87,0,.25); color: #FFC87A; }
+  .cat-model    { background: rgba(100,180,255,.18); color: #90CAFF; }
+  .cat-tech     { background: rgba(100,220,150,.18); color: #7CDBA2; }
+  .cat-history  { background: rgba(220,180,100,.18); color: #DDBB68; }
+  .cat-business { background: rgba(200,100,200,.18); color: #D99DD9; }
+  .cat-infra    { background: rgba(100,200,220,.18); color: #78D4E4; }
+
+  .card-body { padding: 16px 18px; }
+  .def-label {
+    font-size: .67rem;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--orange);
+    margin-bottom: 4px;
+  }
+  .def-text {
+    font-size: .88rem;
+    line-height: 1.55;
+    color: var(--text);
+    margin-bottom: 12px;
+  }
+  .example-block {
+    background: var(--tan);
+    border-left: 3px solid var(--orange);
+    border-radius: 0 6px 6px 0;
+    padding: 10px 13px;
+    margin-top: 4px;
+  }
+  .example-block .def-label { color: var(--orange-dk); }
+  .example-block .def-text { color: var(--dark); margin-bottom: 0; font-style: italic; }
+
+  /* ── QUIZ ── */
+  .quiz-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .score-box {
+    background: var(--dark);
+    border-radius: 10px;
+    padding: 10px 22px;
+    color: #fff;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.6rem;
+    letter-spacing: .08em;
+  }
+  .score-box span { color: var(--gold); }
+  .reset-btn {
+    background: var(--orange);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 700;
+    font-size: .88rem;
+    letter-spacing: .02em;
+    cursor: pointer;
+    transition: background .18s, transform .12s;
+  }
+  .reset-btn:hover { background: var(--orange-dk); transform: scale(1.03); }
+
+  .progress-bar {
+    height: 7px;
+    background: var(--border);
+    border-radius: 99px;
+    overflow: hidden;
+    margin-bottom: 30px;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--orange), var(--gold));
+    border-radius: 99px;
+    transition: width .4s ease;
+  }
+
+  .question-card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 26px 26px 22px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 8px rgba(26,18,8,.05);
+  }
+  .q-num {
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--orange);
+    margin-bottom: 8px;
+  }
+  .q-scenario {
+    font-size: .93rem;
+    line-height: 1.7;
+    color: var(--text);
+    margin-bottom: 18px;
+    padding: 14px 16px;
+    background: var(--tan);
+    border-radius: 8px;
+    border-left: 4px solid var(--orange);
+  }
+  .q-stem {
+    font-size: .95rem;
+    font-weight: 600;
+    color: var(--dark);
+    margin-bottom: 14px;
+    line-height: 1.5;
+  }
+  .options { display: flex; flex-direction: column; gap: 10px; }
+  .opt-btn {
+    background: var(--tan);
+    border: 2px solid var(--border);
+    border-radius: 9px;
+    padding: 12px 16px;
+    text-align: left;
+    font-family: 'DM Sans', sans-serif;
+    font-size: .9rem;
+    color: var(--text);
+    cursor: pointer;
+    transition: all .18s;
+    line-height: 1.45;
+  }
+  .opt-btn:hover:not(:disabled) {
+    border-color: var(--orange);
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(191,87,0,.12);
+  }
+  .opt-btn .opt-letter {
+    display: inline-block;
+    font-weight: 700;
+    color: var(--orange);
+    margin-right: 6px;
+  }
+  .opt-btn.correct {
+    background: var(--green-bg);
+    border-color: var(--green);
+    color: var(--green);
+    font-weight: 600;
+  }
+  .opt-btn.wrong {
+    background: var(--red-bg);
+    border-color: var(--red);
+    color: var(--red);
+  }
+  .opt-btn:disabled { cursor: default; }
+
+  .explanation {
+    margin-top: 18px;
+    background: #FFFBF4;
+    border: 1px solid var(--gold);
+    border-radius: 10px;
+    padding: 16px 18px;
+    font-size: .88rem;
+    line-height: 1.6;
+    color: var(--dark);
+    animation: fadeUp .3s ease;
+  }
+  .explanation strong { color: var(--orange-dk); }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  .no-results {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--muted);
+    font-size: 1rem;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="badge">MIS 301 · McCombs School of Business · UT Austin</div>
+    <h1>Open Source Software</h1>
+    <p class="sub">Vocabulary Study Guide &amp; Practice Quiz &nbsp;·&nbsp; Chapter 8</p>
+  </div>
+  <div class="longhorn-accent">🤘</div>
+</header>
+
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab('vocab', this)">📖&nbsp; Vocab Terms</button>
+  <button class="tab-btn" onclick="switchTab('quiz', this)">📝&nbsp; Practice Quiz</button>
+</div>
+
+<div class="container">
+
+  <!-- ══════════════ VOCAB TAB ══════════════ -->
+  <div id="tab-vocab" class="tab-panel active">
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="search-input" placeholder="Search terms, definitions, examples…" oninput="filterCards()"/>
+    </div>
+    <div id="vocab-count"></div>
+    <div id="vocab-grid"></div>
+  </div>
+
+  <!-- ══════════════ QUIZ TAB ══════════════ -->
+  <div id="tab-quiz" class="tab-panel">
+    <div class="quiz-header">
+      <div class="score-box">SCORE &nbsp;<span id="score-display">0</span> / 5</div>
+      <button class="reset-btn" onclick="resetQuiz()">↺ &nbsp;Retake Quiz</button>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+    <div id="quiz-container"></div>
+  </div>
+
+</div>
+
+<script>
+// ══════════════════════════════════
+//  VOCAB DATA
+// ══════════════════════════════════
+const terms = [
+  {
+    term: "Open Source Software (OSS)",
+    cat: "core", catLabel: "Core Concept",
+    exact: "Software whose source code is publicly available for anyone to view, download, modify, and redistribute. Most OSS licenses prohibit selling derivative or customized versions; vendors instead monetize through support, consulting, or managed services.",
+    simple: "Software where anyone can see the 'recipe' (code), change it, and share it for free. Think of it like a Wikipedia article anyone can edit.",
+    example: "Linux is OSS — Linus Torvalds posted the code online in 1991, and today thousands of developers worldwide have contributed to it. Android, which runs on billions of phones, is also OSS built on Linux."
+  },
+  {
+    term: "Closed Source (Proprietary) Software",
+    cat: "core", catLabel: "Core Concept",
+    exact: "Software where the source code is treated as intellectual property and a closely guarded secret. Only employees of the owning company can modify the code. Vendors monetize by selling executable licenses or charging monthly SaaS subscription fees.",
+    simple: "Software where only the company that made it can see and change the code. You can use it but can't peek inside.",
+    example: "Microsoft Windows — you can install and run it, but Microsoft never lets you see the source code. Same with Apple's macOS and iOS."
+  },
+  {
+    term: "Source Code",
+    cat: "core", catLabel: "Core Concept",
+    exact: "Human-readable instructions written in a programming language (e.g., Python, Java, C++) that define how software behaves. It must be compiled or interpreted before a computer can execute it as machine code.",
+    simple: "The actual written instructions (like a recipe) that programmers write to create software. Computers can't read it directly — it has to be translated first.",
+    example: "If you type 'print(\"Hello World\")' in Python and save that file, that's source code. The Python interpreter translates it to machine instructions your CPU can run."
+  },
+  {
+    term: "Konana's Ecosystem",
+    cat: "model", catLabel: "Framework",
+    exact: "A layered model of the IT ecosystem (Konana, 2007) with six concentric rings from innermost to outermost: Hardware → Operating System → Database Management System → Middleware → Enterprise Applications → Consumer Applications.",
+    simple: "A bull's-eye diagram showing how software layers build on top of each other — hardware at the center, user apps on the outside.",
+    example: "A Facebook post touches every layer: the data center hardware, Linux OS, MySQL database, Apache middleware, enterprise app logic, and finally the consumer app you see in your browser."
+  },
+  {
+    term: "Middleware",
+    cat: "model", catLabel: "Framework",
+    exact: "Software in the middle tier of Konana's Ecosystem that transports and translates data between applications and databases. In web architectures, a web server (e.g., Apache, Express.js) typically plays this role.",
+    simple: "The 'waitstaff' layer — it takes your request from the app, runs to the kitchen (database), and brings data back to you.",
+    example: "When you search for a product on Amazon, Apache (or a similar web server) receives your request, queries the database, and sends the results back to your browser — that's middleware in action."
+  },
+  {
+    term: "Database Management System (DBMS)",
+    cat: "model", catLabel: "Framework",
+    exact: "The software layer in Konana's Ecosystem responsible for data persistence, storage, and input/output operations. Examples include MySQL (relational/SQL) and MongoDB (NoSQL/document-based).",
+    simple: "The software that manages where data is stored and retrieved. Think of it as the filing cabinet manager for an application.",
+    example: "When you create a Spotify account, your username, password, and playlist preferences are stored and retrieved by a DBMS like MySQL or PostgreSQL."
+  },
+  {
+    term: "Operating System (OS)",
+    cat: "model", catLabel: "Framework",
+    exact: "The software layer in Konana's Ecosystem that controls and allocates hardware resources (CPU, memory, storage) and provides a platform on which all other software runs.",
+    simple: "The boss of the computer that manages all the physical parts and lets other programs run on top.",
+    example: "Linux, Windows, and macOS are all operating systems. When you run Excel, the OS manages giving it memory, CPU time, and storage access."
+  },
+  {
+    term: "Compiled Language",
+    cat: "tech", catLabel: "Programming",
+    exact: "A programming language whose source code is fully translated into machine code (binary executable) by a compiler before runtime. Compiled programs run directly on hardware without a runtime intermediary, making them generally faster.",
+    simple: "A programming language that gets fully translated into machine instructions before it runs — like translating an entire book before reading it.",
+    example: "C and C++ are compiled. When game studios build a video game in C++, they compile it into an .exe file. Your computer runs the compiled version, not the original code."
+  },
+  {
+    term: "Interpreted Language",
+    cat: "tech", catLabel: "Programming",
+    exact: "A programming language whose source code is executed line-by-line at runtime by an interpreter (a runtime application that sits on top of the OS). Generally slower than compiled languages but easier to write and more portable.",
+    simple: "A programming language that gets translated on-the-fly as it runs — like an interpreter translating a speech word-by-word in real time.",
+    example: "Python is interpreted. When you run a Python script, the Python interpreter reads and executes each line one at a time. This is why Python code can run on any machine with Python installed."
+  },
+  {
+    term: "Free Software Foundation (FSF)",
+    cat: "history", catLabel: "History",
+    exact: "An organization founded in 1983 by Richard Stallman on the moral principle that restricting software source code is ethically wrong. The FSF created the GNU project and the GPL license to guarantee software freedom.",
+    simple: "The nonprofit Richard Stallman started in 1983 that said 'software should be free for everyone to use, modify, and share' — it kicked off the whole open-source movement.",
+    example: "The FSF created GNU (a free Unix-like OS), which, when combined with Linus Torvalds' Linux kernel in 1991, produced what we now call the Linux operating system."
+  },
+  {
+    term: "GNU General Public License (GPL)",
+    cat: "history", catLabel: "History",
+    exact: "An OSS license created by the FSF to guarantee that software remains 'free as in speech.' It requires that any derivative works also be distributed under the GPL, ensuring the code stays open-source forever.",
+    simple: "The legal rulebook for free software that says: if you use this code and change it, you have to share your changes too. It keeps the code free for everyone, always.",
+    example: "Linux uses the GPL. If a company takes Linux, modifies it, and wants to distribute it, they must publish their changes — which is why Android's core modifications to Linux are publicly available."
+  },
+  {
+    term: "Linux Kernel",
+    cat: "history", catLabel: "History",
+    exact: "The core (kernel) of the Linux operating system, created in 1991 by Linus Torvalds. It is the foundational component that directly manages hardware resources and was combined with the FSF's GNU utilities to create a complete, reliable, and free OS.",
+    simple: "The heart of Linux — the core program that talks to the computer's hardware. Linus Torvalds built it in 1991 as a college student in Finland.",
+    example: "The Linux kernel runs on everything from the servers hosting Google's search engine to Android smartphones to the International Space Station's computers."
+  },
+  {
+    term: "The Bus Factor",
+    cat: "business", catLabel: "Risk",
+    exact: "A risk measurement equal to the minimum number of key developers whose sudden unavailability (e.g., 'hit by a bus') would cause a project to fail. In the early 2000s, the global internet was dangerously dependent on a handful of unpaid Linux volunteers.",
+    simple: "The risk that your whole project collapses if just one or two critical people leave. If only 2 people know how to maintain something critical, the bus factor is 2.",
+    example: "In the early 2000s, multi-billion-dollar corporate internet infrastructure ran on a Linux kernel maintained by a tiny group of unpaid volunteers — a textbook bus factor crisis."
+  },
+  {
+    term: "Fragmentation Risk / Unix Wars",
+    cat: "history", catLabel: "History",
+    exact: "The risk that competing companies will each create incompatible forks of an OS, destroying the ecosystem's unity. This happened with Unix in the 1980s–90s ('Unix Wars'), creating incompatible versions that raised costs industry-wide — a scenario the Linux Foundation was created to prevent.",
+    simple: "The fear that different companies will all take the same open-source project and make incompatible versions, splitting it into a mess — like if every state had its own version of the dollar.",
+    example: "In the 1980s–90s, AT&T, IBM, Sun, HP, and others each made their own incompatible version of Unix. You couldn't easily move software from one to another. The Linux Foundation was created so this never happens to Linux."
+  },
+  {
+    term: "Linux Foundation",
+    cat: "history", catLabel: "History",
+    exact: "An industry trade association formed in 2007 when competing tech giants (IBM, HP, Intel, Oracle, Novell) agreed to collaborate. Its mission is to pay core Linux maintainers, standardize the codebase, and legally protect the Linux trademark to ensure stability for global commerce.",
+    simple: "The organization where bitter rivals like IBM and Oracle agreed to work together to protect Linux — because they all needed it to run their businesses.",
+    example: "The Linux Foundation is like a homeowners association for the internet's infrastructure — companies pay dues to keep the shared 'neighborhood' (Linux) well-maintained and legally protected."
+  },
+  {
+    term: "Open Source Development Labs (OSDL)",
+    cat: "history", catLabel: "History",
+    exact: "An industry consortium formed in 2000 — predecessor to the Linux Foundation — specifically created to hire Linus Torvalds as a full-time paid developer to address the Bus Factor risk of the Linux kernel.",
+    simple: "The group formed in 2000 that gave Linus Torvalds his first paycheck for working on Linux full-time, so the internet didn't depend on a volunteer.",
+    example: "Before OSDL, Linus Torvalds maintained the Linux kernel for free in his spare time. OSDL giving him a salary was the first step in professionalizing open-source infrastructure."
+  },
+  {
+    term: "Web 1.0 vs. Web 2.0",
+    cat: "tech", catLabel: "Tech Concepts",
+    exact: "Web 1.0 refers to the early internet of static, read-only web pages. Web 2.0 describes the shift to dynamic, interactive web pages where users can create and share content (e.g., YouTube, blogs, wikis, social media). Web 2.0 required new technologies like OSS stacks.",
+    simple: "Web 1.0 = websites you could only read (like a digital brochure). Web 2.0 = websites you can interact with, post on, and share from — like Instagram or Wikipedia.",
+    example: "A 1998 corporate homepage showing company info = Web 1.0. TikTok, where you create, comment, and share = Web 2.0."
+  },
+  {
+    term: "Technology Stack (Tech Stack)",
+    cat: "tech", catLabel: "Tech Concepts",
+    exact: "A coordinated set of layered software technologies — OS, database, middleware/web server, and programming language — that work together to make a website or application function.",
+    simple: "All the software layers that work together to run a website or app. Like the full kitchen setup (building, pantry, cooks, and menu board) needed to run a restaurant.",
+    example: "Instagram's tech stack includes Linux (OS), PostgreSQL (database), NGINX (web server), and Python/Django (programming). Change any layer and the whole app behaves differently."
+  },
+  {
+    term: "LAMP Stack",
+    cat: "tech", catLabel: "Tech Concepts",
+    exact: "The original and most prevalent open-source web stack: Linux (OS), Apache (web server/middleware), MySQL (relational database), and PHP/Python/Perl (programming languages). Still powers 40%+ of websites globally.",
+    simple: "The classic set of free tools used to build most early websites — Linux, Apache, MySQL, and PHP — all open source, all free.",
+    example: "Facebook, YouTube, Slack, and Wikipedia were all originally built on the LAMP stack. MySQL stores your user data, PHP generates dynamic pages, Apache handles requests, and Linux runs the servers."
+  },
+  {
+    term: "MEAN Stack",
+    cat: "tech", catLabel: "Tech Concepts",
+    exact: "A modern OSS web stack using MongoDB (NoSQL document database), Express.js (web server), Angular (front-end framework), and Node.js (JavaScript runtime). Designed for real-time, data-heavy applications using JavaScript throughout every layer.",
+    simple: "The modern web stack that uses JavaScript for everything — MongoDB for data, Express for the server, Angular for the front-end, and Node.js to run JS on the server.",
+    example: "Netflix and Uber use MEAN-style stacks because they need real-time data (live driver location, video buffering) and a single language (JavaScript) across all layers makes development faster."
+  },
+  {
+    term: "Full Stack Developer",
+    cat: "tech", catLabel: "Tech Concepts",
+    exact: "A software developer who can work across all layers of a technology stack — both the front-end (client-side) and back-end (server-side, database). The MEAN stack's use of JavaScript throughout makes hiring full-stack developers easier than the multi-language LAMP stack.",
+    simple: "A developer who can do everything — build what you see on screen AND manage the behind-the-scenes server and database logic.",
+    example: "A MEAN stack full-stack developer writes Angular code for the app's interface, Node.js/Express for the server, and MongoDB queries for the database — all in one language: JavaScript."
+  },
+  {
+    term: "API (Application Programmer Interface)",
+    cat: "tech", catLabel: "Tech Concepts",
+    exact: "A defined set of rules and protocols that allows one software component or layer to communicate with another. In tech stacks, programmers use APIs to interact with each layer (e.g., database APIs, OS APIs) without needing to know the inner workings of that layer.",
+    simple: "The rulebook for how different software pieces talk to each other. Like a waiter who knows how to take your order and communicate it to the kitchen using a standard process.",
+    example: "When an app asks Google Maps for directions, it uses Google's Maps API — a predefined set of requests and responses both sides agree to follow."
+  },
+  {
+    term: "Hybrid Stack",
+    cat: "tech", catLabel: "Tech Concepts",
+    exact: "A customized technology stack in which large organizations mix and match components from different standard stacks (e.g., combining LAMP's Apache with MEAN's MongoDB), or add entirely new components, to meet specific performance or business needs.",
+    simple: "When a big company takes the best parts from different stacks and mixes them together to build exactly what they need.",
+    example: "A large bank might use Linux (from LAMP) + MongoDB (from MEAN) + their own proprietary security middleware — that custom combination is a hybrid stack."
+  },
+  {
+    term: "Open Standards",
+    cat: "core", catLabel: "Core Concept",
+    exact: "Technical specifications published so that any company can develop compatible software or hardware without needing permission from the standard's creator. Promotes interoperability and competition.",
+    simple: "Rules for how software should work that are public and free for anyone to use, so any company can make software that works with other brands.",
+    example: "Microsoft uses open standards for Excel files (.xlsx) — this is why OpenOffice can also open .xlsx files without getting permission from Microsoft."
+  },
+  {
+    term: "Closed Standards",
+    cat: "core", catLabel: "Core Concept",
+    exact: "Technical specifications controlled by a single company that requires other companies to get permission (often via license or approval) before building compatible or complementary products.",
+    simple: "Rules for how software works that are kept private — you need the owner's OK to build anything that works with their product.",
+    example: "Apple's ecosystem uses closed standards — to publish an iPhone app, developers must get Apple's approval and pay Apple 30% of revenue, unlike the open Microsoft ecosystem."
+  },
+  {
+    term: "SaaS (Software as a Service)",
+    cat: "core", catLabel: "Core Concept",
+    exact: "A software delivery model in which software runs on remote servers (hosted/cloud) and users access it via a web browser on a subscription basis, rather than installing it locally.",
+    simple: "Paying a monthly fee to use software online through your browser instead of downloading it — like Netflix for software.",
+    example: "Excel in Office 365 = SaaS. You pay Microsoft a monthly fee and access Excel in your browser or synced app. The software runs on Microsoft's servers, not just your computer."
+  },
+  {
+    term: "Total Cost of Ownership (TCO)",
+    cat: "business", catLabel: "Business",
+    exact: "The full cost of acquiring, operating, and maintaining a technology over its lifetime. For OSS, even though the license is free, TCO can be higher if self-managed due to the need for internal expertise, lack of formal support contracts, and integration costs.",
+    simple: "The real total cost of using something — not just what you paid up front, but everything it costs to keep it running over time.",
+    example: "Linux is free to download, but if your company deploys it and then has no support contract, fixing a 2 AM server crash costs expensive engineer hours — so the TCO might be higher than expected."
+  },
+  {
+    term: "The Anaconda Model (OSS Business Model)",
+    cat: "business", catLabel: "Business",
+    exact: "An OSS monetization strategy in which the core software is free, but the vendor charges enterprises for premium management, security, integration, and deployment tools needed at scale. Named after Anaconda, which gives Python/R away but charges Fortune 500 companies for enterprise-grade data science management tools.",
+    simple: "Give the basic software away for free, then charge big companies for the fancy management tools they need to use it at massive scale.",
+    example: "Python is free. But Anaconda charges companies like JP Morgan for the enterprise version that lets 5,000 data scientists securely share packages and integrate with corporate systems."
+  },
+  {
+    term: "Data Readiness",
+    cat: "business", catLabel: "Business / AI",
+    exact: "An organization's ability to effectively use AI, determined by the quality, structure, accessibility, and governance of its data infrastructure. AI models are only as good as the data they are fed; fragmented or poorly governed data stacks prevent reliable AI insights.",
+    simple: "Whether a company's data is clean, organized, and ready to be used by AI. Garbage in = garbage out.",
+    example: "A hospital that wants to use AI to predict patient readmissions can't do it if patient records are spread across five disconnected systems with different formats — their data readiness is too low."
+  },
+  {
+    term: '"Keeping the Lights On"',
+    cat: "business", catLabel: "Business",
+    exact: "A phrase describing routine IT infrastructure maintenance and operations (keeping systems running) that does not generate competitive advantage. The argument is that by using free OSS for infrastructure, companies can redirect funds previously spent on 'keeping the lights on' to innovation.",
+    simple: "Spending IT money just to keep basic systems running — which doesn't help you beat competitors. OSS makes this cheaper so you can spend on things that matter.",
+    example: "A retailer paying $10M/year for Windows Server licenses is 'keeping the lights on.' Switching to free Linux saves that $10M which can fund a new customer recommendation engine instead."
+  },
+  {
+    term: "NoSQL / Document Database",
+    cat: "tech", catLabel: "Tech Concepts",
+    exact: "A non-relational database that stores data as flexible documents (often JSON format) rather than rigid rows and columns. MongoDB is the primary example in the MEAN stack. Better than SQL/relational databases for unstructured, rapidly changing, or hierarchical data.",
+    simple: "A database that stores data more like a file cabinet of flexible documents (like JSON files) instead of neat spreadsheet rows — great for messy or constantly changing data.",
+    example: "MongoDB stores each user's Instagram profile as a single flexible document containing posts, followers, bio, etc. Adding a new field (like 'Reels') doesn't break every other record like it would in a rigid SQL table."
+  },
+  {
+    term: "Linus Torvalds",
+    cat: "history", catLabel: "History",
+    exact: "Finnish-American software engineer who created the Linux kernel in 1991 as a college student. He combined his kernel with the FSF's GNU project to produce a complete OS. He was later hired full-time by the Open Source Development Labs (now Linux Foundation) to maintain Linux.",
+    simple: "The Finnish college student who built Linux in 1991 and changed the internet forever. He's still actively maintaining the Linux kernel today.",
+    example: "Torvalds is also the creator of Git — the version control system used by virtually every software developer in the world (and the foundation of GitHub)."
+  },
+  {
+    term: "Richard Stallman",
+    cat: "history", catLabel: "History",
+    exact: "American programmer who founded the Free Software Foundation (FSF) in 1983 and created the GNU General Public License (GPL). He championed the moral argument that restricting software source code is ethically wrong.",
+    simple: "The activist programmer who started the 'free software' movement in 1983, arguing that hiding source code is morally wrong.",
+    example: "Stallman famously refused to use software that he couldn't inspect or modify. He began writing a completely free Unix-like OS (GNU) in 1983, which later was completed by Torvalds' Linux kernel."
+  },
+];
+
+// ══════════════════════════════════
+//  QUIZ DATA
+// ══════════════════════════════════
+const questions = [
+  {
+    num: 1,
+    scenario: "Your friend is a junior developer at a startup called \"Longhorn Connect\" that built its entire campus event platform on a single open-source routing library. The library is maintained by exactly two unpaid graduate students who recently announced they're accepting paid internships at different companies and may not have time to maintain it anymore. The CTO panics, realizing the entire platform — which handles thousands of daily users — could break with no one left to fix it.",
+    stem: "Which concept from this chapter BEST describes the risk the CTO has just identified?",
+    options: [
+      { letter: "A", text: "Fragmentation Risk — the two developers might create incompatible forks of the library and split the codebase." },
+      { letter: "B", text: "The Bus Factor — critical infrastructure depends on a small number of unpaid maintainers who could become unavailable at any time." },
+      { letter: "C", text: "Closed Standards — the library uses proprietary rules that make it impossible for new developers to contribute." },
+      { letter: "D", text: "Total Cost of Ownership — the company underestimated how expensive open-source support would become over time." },
+    ],
+    correct: "B",
+    explanation: `<strong>✅ Correct Answer: B — The Bus Factor.</strong> The Bus Factor is defined as the minimum number of people whose unavailability would cause a project to fail. In this scenario, only 2 unpaid developers maintain a mission-critical system — a textbook example of low bus factor. This is exactly the risk the slides describe from the early 2000s internet boom, where major corporate infrastructure depended on a handful of Linux volunteers.<br><br>
+<strong>Why the others are wrong:</strong><br>
+<strong>A (Fragmentation Risk)</strong> refers to the danger of companies creating incompatible forks of an OS (like the Unix Wars), not the risk of maintainers leaving.<br>
+<strong>C (Closed Standards)</strong> is the opposite situation — closed standards prevent outside contribution. An open-source library has openly published code anyone can contribute to.<br>
+<strong>D (Total Cost of Ownership)</strong> refers to the full lifetime cost of a technology, not the risk of losing key people.`
+  },
+  {
+    num: 2,
+    scenario: "A UT student team is launching a food-delivery app called \"40 Acres Eats.\" Their concept requires real-time driver tracking, live order status updates, and a menu that changes multiple times per day. They have two developers on the team, both of whom only know JavaScript. Their advisor suggests choosing a tech stack and explains they have two main OSS options.",
+    stem: "Which tech stack would MOST effectively support their real-time requirements and small JavaScript-only team?",
+    options: [
+      { letter: "A", text: "LAMP Stack, because MySQL's relational structure is best for storing food orders and customer accounts." },
+      { letter: "B", text: "LAMP Stack, because Apache has the best performance record for consumer-facing mobile applications." },
+      { letter: "C", text: "MEAN Stack, because it supports four programming languages simultaneously, giving the team flexibility." },
+      { letter: "D", text: "MEAN Stack, because MongoDB handles real-time, constantly changing data, and the all-JavaScript architecture matches their team's skills." },
+    ],
+    correct: "D",
+    explanation: `<strong>✅ Correct Answer: D — MEAN Stack.</strong> The slides explicitly state that MEAN was built for "highly dynamic real-time apps (e.g., Netflix, Uber) where data is constantly changing." MongoDB (NoSQL/document database) handles unstructured, rapidly changing data far better than MySQL. Crucially, MEAN's "all-one-language (JavaScript) stack" is the perfect fit for a two-person team that only knows JavaScript.<br><br>
+<strong>Why the others are wrong:</strong><br>
+<strong>A (LAMP/MySQL)</strong> — MySQL is a relational database optimized for structured, consistent data. Real-time driver location constantly updates and doesn't fit rigid tables well. And MySQL is part of LAMP, not a reason to choose it over MEAN for this use case.<br>
+<strong>B (LAMP/Apache)</strong> — Apache is a capable web server, but LAMP's multi-language requirement (PHP/Python/Perl) is a disadvantage for a JavaScript-only team — not an advantage.<br>
+<strong>C</strong> — This misrepresents MEAN. MEAN uses <em>one</em> language (JavaScript) across all layers, not four. LAMP is the one with multiple languages.`
+  },
+  {
+    num: 3,
+    scenario: "You're helping your older sister prep for a job interview at Red Hat, an open-source software company. She's confused about the business model: \"If Linux is free, how does Red Hat charge companies millions of dollars for it?\" She found an article saying that large hospital systems pay Red Hat hundreds of thousands of dollars per year. She turns to you for help explaining it.",
+    stem: "Which concept BEST explains why a hospital system would pay Red Hat large sums for free software?",
+    options: [
+      { letter: "A", text: "Support & Compliance — enterprises pay for certified, enterprise-grade versions, guaranteed uptime support, and regulatory compliance, not the source code itself." },
+      { letter: "B", text: "Open Standards — hospitals must pay Red Hat for permission to build medical apps that are compatible with Linux's open file formats." },
+      { letter: "C", text: "The Bus Factor — hospitals pay Red Hat to ensure that Linux's core developers can't become unavailable and cause systems to fail." },
+      { letter: "D", text: "The Anaconda Model — hospitals pay Red Hat for premium Python and R data science management tools used by their medical researchers." },
+    ],
+    correct: "A",
+    explanation: `<strong>✅ Correct Answer: A — Support & Compliance.</strong> The slides describe this exact scenario: "The code might be free, but if an enterprise's system crashes at 2:00 AM, they want a 1-800 number to call." Hospitals, like all enterprises in regulated industries (finance, healthcare), also need "certified, highly secure, heavily tested versions" that comply with strict regulations like HIPAA. They're paying for insurance, stability, and compliance — not the code.<br><br>
+<strong>Why the others are wrong:</strong><br>
+<strong>B (Open Standards)</strong> — Open standards mean you DON'T need permission. The open standards concept is the opposite: anyone can build compatible software without paying. This confuses open with closed standards.<br>
+<strong>C (The Bus Factor)</strong> — The Bus Factor is a risk assessment concept, not a service hospitals buy. You can't simply "pay to reduce" someone's bus factor through a contract.<br>
+<strong>D (The Anaconda Model)</strong> — The Anaconda Model applies to Anaconda's specific Python/R tooling business, not to Red Hat's enterprise Linux business. Hospitals aren't primarily paying for data science tools here.`
+  },
+  {
+    num: 4,
+    scenario: "During your marketing internship at a mid-sized Austin tech startup, the CEO excitedly announces in an all-hands meeting: \"We're buying access to the most powerful AI language model on the market next quarter — this will transform our analytics!\" Later, your manager pulls you aside, worried. She explains that the company's customer data lives in four different legacy systems, none of which share a common format, and that records are frequently duplicated or missing key fields.",
+    stem: "Which concept from this chapter BEST explains why the CEO's AI investment is likely to underdeliver?",
+    options: [
+      { letter: "A", text: "The Bus Factor — the company doesn't have enough AI engineers to maintain a powerful language model in production." },
+      { letter: "B", text: "Fragmentation Risk — the four data systems might each create incompatible versions of the AI model's outputs." },
+      { letter: "C", text: "Data Readiness — the AI model will only be as effective as the clean, structured, and well-governed data it is fed." },
+      { letter: "D", text: "Total Cost of Ownership — the CEO has underestimated the full 3-year cost of deploying and maintaining a commercial AI model." },
+    ],
+    correct: "C",
+    explanation: `<strong>✅ Correct Answer: C — Data Readiness.</strong> The slides state directly: "AI is only as good as the data it's fed. If your data stack is fragmented, siloed, or poorly governed, no model will deliver reliable insights." The scenario describes exactly this: fragmented, poorly structured data across legacy systems. The manager's concern is a textbook data readiness problem. The slides warn that business leaders focus on buying AI models (the "brain") while ignoring the data infrastructure (the "fuel").<br><br>
+<strong>Why the others are wrong:</strong><br>
+<strong>A (Bus Factor)</strong> — The Bus Factor is about losing key human maintainers, not about whether a technology investment will deliver ROI. No one is leaving the company.<br>
+<strong>B (Fragmentation Risk)</strong> — Fragmentation Risk refers to incompatible versions of an OS or platform being created by different companies (like the Unix Wars), not to separate corporate data systems.<br>
+<strong>D (TCO)</strong> — While TCO is always a valid concern, it doesn't explain WHY the AI investment will fail analytically. The core problem is the quality of data inputs, not the cost of the license.`
+  },
+  {
+    num: 5,
+    scenario: "Three UT student org officers need to share a spreadsheet tracking dues and event attendance. The president uses a MacBook and built the file in Apple Numbers. When she sends it to her co-president, who has a Windows laptop, he can't open it at all. A third officer who took MIS 301 suggests they switch everyone to OpenOffice Calc instead. She references the Software Examples table from class to make her argument.",
+    stem: "Based on the Software Examples table, which statement BEST explains why switching to OpenOffice would solve the compatibility problem?",
+    options: [
+      { letter: "A", text: "OpenOffice has closed source code, which makes it more secure and better at handling cross-platform file formats." },
+      { letter: "B", text: "OpenOffice is a locally run application with open standards, while Numbers uses closed standards that restrict compatibility with non-Apple systems." },
+      { letter: "C", text: "OpenOffice is a hosted SaaS application, so it can be accessed from any device through a web browser without compatibility issues." },
+      { letter: "D", text: "OpenOffice and Numbers use the same underlying source code but are compiled differently for Mac and Windows." },
+    ],
+    correct: "B",
+    explanation: `<strong>✅ Correct Answer: B — Open Standards vs. Closed Standards.</strong> The Software Examples table from the slides shows exactly this: OpenOffice = Open source code, Local execution, <em>Open standards</em>. Apple Numbers = Closed source code, Local execution, <em>Closed standards</em>. Closed standards mean the file format is proprietary to Apple — other operating systems can't open it without Apple's permission or special tools. OpenOffice's open standards mean its file formats are publicly documented and usable anywhere.<br><br>
+<strong>Why the others are wrong:</strong><br>
+<strong>A</strong> — This is factually wrong. The table clearly shows OpenOffice has <em>open</em> (not closed) source code. Closed source code would mean the opposite problem — only the owning company can change it.<br>
+<strong>C</strong> — OpenOffice is a locally installed application (Local execution), not a hosted SaaS tool like Google Sheets or Excel in Office 365. This confuses OpenOffice with a cloud-based alternative.<br>
+<strong>D</strong> — OpenOffice and Numbers have entirely different codebases written by different organizations. They share no common source code. This answer fabricates a technical relationship that doesn't exist.`
+  },
+];
+
+// ══════════════════════════════════
+//  RENDER VOCAB
+// ══════════════════════════════════
+const catMap = {
+  core: "cat-core", model: "cat-model", tech: "cat-tech",
+  history: "cat-history", business: "cat-business", infra: "cat-infra"
+};
+
+function renderVocab(data) {
+  const grid = document.getElementById('vocab-grid');
+  grid.innerHTML = '';
+  if (!data.length) {
+    grid.innerHTML = '<div class="no-results">No terms match your search. Try different keywords.</div>';
+    document.getElementById('vocab-count').textContent = '';
+    return;
+  }
+  document.getElementById('vocab-count').textContent = `Showing ${data.length} of ${terms.length} terms`;
+  data.forEach(t => {
+    const cls = catMap[t.cat] || 'cat-core';
+    grid.innerHTML += `
+      <div class="vocab-card">
+        <div class="card-head">
+          <div class="card-term">${t.term}</div>
+          <span class="cat-tag ${cls}">${t.catLabel}</span>
+        </div>
+        <div class="card-body">
+          <div class="def-label">Exact Definition</div>
+          <div class="def-text">${t.exact}</div>
+          <div class="def-label">Simple Definition</div>
+          <div class="def-text">${t.simple}</div>
+          <div class="example-block">
+            <div class="def-label">Example</div>
+            <div class="def-text">${t.example}</div>
+          </div>
+        </div>
+      </div>`;
+  });
+}
+
+function filterCards() {
+  const q = document.getElementById('search-input').value.toLowerCase();
+  const filtered = !q ? terms : terms.filter(t =>
+    [t.term, t.exact, t.simple, t.example, t.catLabel]
+      .some(s => s.toLowerCase().includes(q))
+  );
+  renderVocab(filtered);
+}
+
+// ══════════════════════════════════
+//  RENDER QUIZ
+// ══════════════════════════════════
+let answered = 0, score = 0;
+
+function renderQuiz() {
+  answered = 0; score = 0;
+  updateScore();
+  const c = document.getElementById('quiz-container');
+  c.innerHTML = '';
+  questions.forEach(q => {
+    const opts = q.options.map(o => `
+      <button class="opt-btn" onclick="answer(this,'${o.letter}','${q.correct}',${q.num})">
+        <span class="opt-letter">${o.letter}.</span> ${o.text}
+      </button>`).join('');
+    c.innerHTML += `
+      <div class="question-card" id="qcard-${q.num}">
+        <div class="q-num">Question ${q.num} of 5</div>
+        <div class="q-scenario">${q.scenario}</div>
+        <div class="q-stem">${q.stem}</div>
+        <div class="options" id="opts-${q.num}">${opts}</div>
+        <div id="exp-${q.num}"></div>
+      </div>`;
+  });
+}
+
+function answer(btn, chosen, correct, qNum) {
+  const opts = document.querySelectorAll(`#opts-${qNum} .opt-btn`);
+  opts.forEach(b => {
+    b.disabled = true;
+    const letter = b.querySelector('.opt-letter').textContent.replace('.','').trim();
+    if (letter === correct) b.classList.add('correct');
+  });
+  if (chosen !== correct) btn.classList.add('wrong');
+  else score++;
+
+  const q = questions[qNum - 1];
+  document.getElementById(`exp-${qNum}`).innerHTML =
+    `<div class="explanation">${q.explanation}</div>`;
+
+  answered++;
+  updateScore();
+}
+
+function updateScore() {
+  document.getElementById('score-display').textContent = score;
+  document.getElementById('progress-fill').style.width = (answered / 5 * 100) + '%';
+}
+
+function resetQuiz() { renderQuiz(); }
+
+// ══════════════════════════════════
+//  TABS
+// ══════════════════════════════════
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ── INIT ──
+renderVocab(terms);
+renderQuiz();
+</script>
+</body>
+</html>
